@@ -1,0 +1,27 @@
+/* frontend/src/index.css */
+
+/* 
+  This imports all of Tailwind's base styles, components, and utilities.
+  It's the modern replacement for the three separate @tailwind directives.
+*/
+@import "tailwindcss";
+
+/*
+  This is the new configuration block. Define all your custom design
+  tokens here as native CSS custom properties.
+*/
+@theme {
+  --color-brand-primary: #dc2626; /* Creates bg-brand-primary, text-brand-primary, etc. */
+  --color-brand-secondary: #4b5563; /* Creates bg-brand-secondary, etc. */
+  --font-sans: "Inter", system-ui, sans-serif; /* Sets the default font family */
+}
+
+/* 
+  You can still apply global base styles. Here we set a default font and
+  colors for light/dark mode on the entire page.
+*/
+body {
+  @apply font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
