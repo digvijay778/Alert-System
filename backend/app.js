@@ -15,6 +15,38 @@ const errorHandler = require('./middlewares/errorMiddleware');
 
 const app = express();
 
+// --- CORS Configuration (Must be first) ---
+// Handle CORS before any other middleware
+app.use(cors({
+  origin: function (origin, callback) {
+    console.log('CORS Origin:', origin);
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost for development
+    if (origin.includes('localhost:5173')) {
+      return callback(null, true);
+    }
+    
+    // Allow any subdomain of your Vercel project
+    if (origin.includes('digvijay778s-projects.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // Block all other origins
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
+// Explicit OPTIONS handler for all routes
+app.options('*', cors());
+
 // --- Security & Performance Middleware ---
 
 // 1. Set various secure HTTP headers
@@ -34,12 +66,7 @@ app.use('/api', limiter); // Apply the rate limiting middleware to all API route
 
 // --- Core Middleware ---
 
-// 4. Enable Cross-Origin Resource Sharing (CORS)
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173'
-}));
-
-// 5. Body Parser Middleware to handle JSON payloads
+// 4. Body Parser Middleware to handle JSON payloads
 app.use(express.json());
 
 
@@ -48,6 +75,15 @@ app.use(express.json());
 // A simple "health check" route to confirm the server is running
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'UP', message: 'Server is healthy' });
+});
+
+// Test CORS route
+app.get('/api/v1/test-cors', (req, res) => {
+  res.status(200).json({ 
+    status: 'CORS working', 
+    origin: req.get('Origin'),
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Mount the application routers

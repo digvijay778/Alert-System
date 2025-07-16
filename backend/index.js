@@ -17,10 +17,16 @@ connectDB();
 const server = http.createServer(app);
 
 // Initialize Socket.IO and attach it to the HTTP server
+const allowedOrigins = [
+  'http://localhost:5173', // Development frontend
+  'https://alert-system-git-main-digvijay778s-projects.vercel.app' // Production frontend
+];
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 

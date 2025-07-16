@@ -11,8 +11,8 @@ const { protect, isAdmin } = require('../middlewares/authMiddleware');
 
 // Define the routes
 // A POST request to /api/v1/alerts will call the createAlert function.
-// It is protected, meaning the user must be logged in to create an alert.
-router.route('/').post( createAlert);
+// Temporarily removing protection for testing
+router.route('/').post(createAlert);
 
 // A GET request to /api/v1/alerts will call the getAlerts function.
 // It is protected and restricted to admins only.
