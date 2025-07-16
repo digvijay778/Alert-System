@@ -19,23 +19,35 @@ const app = express();
 // Handle CORS before any other middleware
 app.use(cors({
   origin: function (origin, callback) {
-    console.log('CORS Origin:', origin);
+    console.log('🔍 CORS Check - Origin:', origin);
     
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('✅ CORS: No origin - allowing');
+      return callback(null, true);
+    }
     
     // Allow localhost for development
-    if (origin.includes('localhost:5173')) {
+    if (origin.includes('localhost')) {
+      console.log('✅ CORS: Localhost - allowing');
       return callback(null, true);
     }
     
     // Allow any subdomain of your Vercel project
     if (origin.includes('digvijay778s-projects.vercel.app')) {
+      console.log('✅ CORS: Vercel subdomain - allowing');
       return callback(null, true);
     }
     
+    // Allow vercel.app domains in general (for any deployment)
+    if (origin.includes('vercel.app')) {
+      console.log('✅ CORS: Vercel domain - allowing');
+      return callback(null, true);
+    }
+    
+    console.log('❌ CORS: Origin blocked:', origin);
     // Block all other origins
-    callback(new Error('Not allowed by CORS'));
+    callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -45,7 +57,14 @@ app.use(cors({
 }));
 
 // Explicit OPTIONS handler for all routes
-app.options('*', cors());
+app.options('*', (req, res) => {
+  console.log('📋 OPTIONS request from:', req.get('Origin'));
+  res.header('Access-Control-Allow-Origin', req.get('Origin'));
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Origin,Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(204);
+});
 
 // --- Security & Performance Middleware ---
 
